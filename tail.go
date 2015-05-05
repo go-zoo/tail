@@ -16,10 +16,14 @@ type Template struct {
 }
 
 func New(id string, src string, cache Cache) *Template {
-	tmpl := &Template{ID: id, Source: src, Cache: cache}
-	tmpl.Refresh()
-	tmpl.WatchFile()
-	return tmpl
+	if cache != nil {
+		tmpl := &Template{ID: id, Source: src, Cache: cache}
+		tmpl.Refresh()
+		tmpl.WatchFile()
+		return tmpl
+	}
+	log.Println("Cache arg cannot be nil")
+	return nil
 }
 
 func (t *Template) Watch(ttl time.Duration) {
