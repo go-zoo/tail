@@ -22,7 +22,7 @@ import(
   // Main package for using tail
   "github.com/go-zoo/tail"
   // import depend of the platform you choose
-  "github.com/go-zoo/tail/rediscaching"
+  "github.com/go-zoo/tail/rediscache"
 )
 
 var (
