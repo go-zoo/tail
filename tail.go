@@ -9,14 +9,14 @@ import (
 )
 
 type Template struct {
-	ID      string
-	Source  string
-	TTL     time.Duration
-	Content Fetch
+	ID     string
+	Source string
+	TTL    time.Duration
+	Cache  Cache
 }
 
-func New(id string, src string, ftch Fetch) *Template {
-	tmpl := &Template{ID: id, Source: src, Content: ftch}
+func New(id string, src string, cache Cache) *Template {
+	tmpl := &Template{ID: id, Source: src, Cache: cache}
 	tmpl.Refresh()
 	return tmpl
 }
@@ -66,19 +66,20 @@ func (t *Template) Refresh() {
 	data, err := ReadTemplateFile(t.Source)
 	if err != nil {
 		log.Println(err)
+		return
 	}
-	err = t.Content.SetData(t.ID, data)
+	err = t.Cache.Set(t.ID, data)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
 func (t *Template) Get() []byte {
-	return t.Content.GetData(t.ID)
+	return t.Cache.Get(t.ID)
 }
 
-func (t *Template) Set(id string, data interface{}) error {
-	err := t.Content.SetData(t.ID, data)
+func (t *Template) Set(id string, data []byte) error {
+	err := t.Cache.Set(t.ID, data)
 	if err != nil {
 		return err
 	}
