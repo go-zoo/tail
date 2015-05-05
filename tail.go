@@ -18,6 +18,7 @@ type Template struct {
 func New(id string, src string, cache Cache) *Template {
 	tmpl := &Template{ID: id, Source: src, Cache: cache}
 	tmpl.Refresh()
+	tmpl.WatchFile()
 	return tmpl
 }
 
