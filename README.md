@@ -1,4 +1,4 @@
-bone [![GoDoc](https://godoc.org/github.com/go-zoo/tail?status.png)](http://godoc.org/github.com/go-zoo/tail) [![Build Status](https://travis-ci.org/go-zoo/tail.svg)](https://travis-ci.org/go-zoo/tail)
+tail [![GoDoc](https://godoc.org/github.com/go-zoo/tail?status.png)](http://godoc.org/github.com/go-zoo/tail) [![Build Status](https://travis-ci.org/go-zoo/tail.svg)](https://travis-ci.org/go-zoo/tail)
 =======
 
 ## What is tail ?
