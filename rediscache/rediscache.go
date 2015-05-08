@@ -6,7 +6,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-// Redis template caching
+// Redis Assets caching
 
 type RedisCache struct {
 	source redis.Conn
@@ -26,7 +26,10 @@ func (f *RedisCache) Get(id string) []byte {
 		log.Println(err)
 		return nil
 	}
-	return n.([]byte)
+	if n != nil {
+		return n.([]byte)
+	}
+	return nil
 }
 
 func (f *RedisCache) Set(id string, data []byte) error {

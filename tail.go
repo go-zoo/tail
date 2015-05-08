@@ -1,42 +1,45 @@
 package tail
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"log"
 	"time"
 
 	"github.com/go-fsnotify/fsnotify"
 )
 
-type Template struct {
+type Asset struct {
 	ID     string
 	Source string
 	TTL    time.Duration
+	Data   []byte
 	Cache  Cache
 }
 
-func New(id string, src string, cache Cache) *Template {
+func New(id string, src string, cache Cache) *Asset {
 	if cache != nil {
-		tmpl := &Template{ID: id, Source: src, Cache: cache}
-		tmpl.Refresh()
-		tmpl.WatchFile()
-		return tmpl
+		asset := &Asset{ID: id, Source: src, Cache: cache}
+		asset.Refresh()
+		asset.WatchFile()
+		return asset
 	}
 	log.Println("Cache arg cannot be nil")
 	return nil
 }
 
-func (t *Template) Watch(ttl time.Duration) {
-	fmt.Printf("[+] Refreshing %s template each %s\n", t.Source, ttl.String())
+func (a *Asset) Watch(ttl time.Duration) {
+	fmt.Printf("[+] Refreshing %s Asset each %s\n", a.Source, ttl.String())
 	go func() {
 		for {
-			time.AfterFunc(ttl, t.Refresh)
+			time.AfterFunc(ttl, a.Refresh)
 			time.Sleep(ttl)
 		}
 	}()
 }
 
-func (t *Template) WatchFile() {
+func (a *Asset) WatchFile() {
 	go func() {
 		watcher, err := fsnotify.NewWatcher()
 		if err != nil {
@@ -50,7 +53,7 @@ func (t *Template) WatchFile() {
 				select {
 				case event := <-watcher.Events:
 					if event.Op&fsnotify.Write == fsnotify.Write {
-						t.Refresh()
+						a.Refresh()
 					}
 				case err := <-watcher.Errors:
 					log.Println(err)
@@ -58,7 +61,7 @@ func (t *Template) WatchFile() {
 
 			}
 		}()
-		err = watcher.Add(t.Source)
+		err = watcher.Add(a.Source)
 		if err != nil {
 			log.Println(err)
 
@@ -67,26 +70,39 @@ func (t *Template) WatchFile() {
 	}()
 }
 
-func (t *Template) Refresh() {
-	data, err := ReadTemplateFile(t.Source)
+func (a *Asset) Refresh() {
+	data, err := ReadAssetFile(a.Source)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	err = t.Cache.Set(t.ID, data)
+	err = a.Cache.Set(a.ID, data)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func (t *Template) Get() []byte {
-	return t.Cache.Get(t.ID)
+func (a *Asset) Get() []byte {
+	return a.Cache.Get(a.ID)
 }
 
-func (t *Template) Set(id string, data []byte) error {
-	err := t.Cache.Set(t.ID, data)
+func (a *Asset) Set(id string, data []byte) error {
+	err := a.Cache.Set(a.ID, data)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *Asset) Build() {
+	var cmp []byte
+	buffer := bytes.NewBuffer(cmp)
+
+	tmp := template.New(a.ID)
+	tmp.Parse(string(a.Cache.Get(a.ID)))
+	tmp.Execute(buffer, a.Data)
+
+	a.Set(a.ID, buffer.Bytes())
+
+	fmt.Println(buffer.String())
 }
