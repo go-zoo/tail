@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-zoo/tail"
 	"github.com/go-zoo/tail/rediscache"
@@ -10,10 +10,11 @@ import (
 
 type Data struct {
 	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
 var (
-	cache = rediscache.New("tcp", "104.236.16.169:6379")
+	cache, _ = rediscache.New("tcp", "104.236.16.169:6379")
 	//memcache.New()
 	//rediscache.New("tcp", "104.236.16.169:6379")
 	//boltcache.New("fetch.db", 0600, nil)
@@ -21,13 +22,6 @@ var (
 	IndexTmpl = tail.New("index", "index.html", cache)
 	Img       = tail.New("img", "logo.png", cache)
 )
-
-func init() {
-	n := Data{"Some APP"}
-	raw, _ := json.Marshal(n)
-	IndexTmpl.Data = raw
-	IndexTmpl.Build()
-}
 
 func main() {
 	http.HandleFunc("/", indexHandler)
@@ -37,9 +31,15 @@ func main() {
 }
 
 func indexHandler(rw http.ResponseWriter, req *http.Request) {
-	rw.Write(IndexTmpl.Get())
+	if req.URL.Path != "/" {
+		d := Data{Name: time.Now().String()}
+		IndexTmpl.Rebuild("911205", d)
+	}
+	data, _ := IndexTmpl.Get("911205")
+	rw.Write(data)
 }
 
 func imgHandler(rw http.ResponseWriter, req *http.Request) {
-	rw.Write(Img.Get())
+	data, _ := Img.Get("")
+	rw.Write(data)
 }

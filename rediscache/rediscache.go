@@ -12,12 +12,12 @@ type RedisCache struct {
 	source redis.Conn
 }
 
-func New(net string, addr string) *RedisCache {
+func New(net string, addr string) (*RedisCache, error) {
 	conn, err := redis.Dial(net, addr)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return &RedisCache{conn}
+	return &RedisCache{conn}, nil
 }
 
 func (f *RedisCache) Get(id string) []byte {
@@ -34,7 +34,7 @@ func (f *RedisCache) Get(id string) []byte {
 
 func (f *RedisCache) Set(id string, data []byte) error {
 	_, err := f.source.Do("SET", id, data)
-	if err != err {
+	if err != nil {
 		return err
 	}
 	return nil

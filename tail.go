@@ -2,19 +2,19 @@ package tail
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"time"
 
-	"github.com/go-fsnotify/fsnotify"
+	_ "github.com/boltdb/bolt"
+	_ "github.com/garyburd/redigo/redis"
 )
 
 type Asset struct {
 	ID     string
 	Source string
-	TTL    time.Duration
-	Data   []byte
+	Data   bytes.Buffer
 	Cache  Cache
 }
 
@@ -25,7 +25,7 @@ func New(id string, src string, cache Cache) *Asset {
 		asset.WatchFile()
 		return asset
 	}
-	log.Println("Cache arg cannot be nil")
+	fmt.Println("Cache arg cannot be nil")
 	return nil
 }
 
@@ -39,70 +39,78 @@ func (a *Asset) Watch(ttl time.Duration) {
 	}()
 }
 
-func (a *Asset) WatchFile() {
-	go func() {
-		watcher, err := fsnotify.NewWatcher()
-		if err != nil {
-			log.Println(err)
-		}
-		defer watcher.Close()
-
-		done := make(chan bool)
-		go func() {
-			for {
-				select {
-				case event := <-watcher.Events:
-					if event.Op&fsnotify.Write == fsnotify.Write {
-						a.Refresh()
-					}
-				case err := <-watcher.Errors:
-					log.Println(err)
-				}
-
-			}
-		}()
-		err = watcher.Add(a.Source)
-		if err != nil {
-			log.Println(err)
-
-		}
-		<-done
-	}()
-}
-
 func (a *Asset) Refresh() {
 	data, err := ReadAssetFile(a.Source)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		return
 	}
 	err = a.Cache.Set(a.ID, data)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 }
 
-func (a *Asset) Get() []byte {
+func (a *Asset) get() []byte {
 	return a.Cache.Get(a.ID)
 }
 
+func (a *Asset) Get(id string) ([]byte, error) {
+	d := a.Cache.Get(a.buildId(id))
+	if d == nil {
+		return nil, errors.New(fmt.Sprintf("%s not found !", id))
+	}
+	return d, nil
+}
+
+func (a *Asset) GetOrBuild(id string, data interface{}) ([]byte, error) {
+	d := a.Cache.Get(a.buildId(id))
+	if d == nil {
+		err := a.build(id, data)
+		if err != nil {
+			return nil, err
+		}
+		return a.Cache.Get(a.buildId(id)), nil
+	}
+	return d, nil
+}
+
 func (a *Asset) Set(id string, data []byte) error {
-	err := a.Cache.Set(a.ID, data)
+	err := a.Cache.Set(id, data)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *Asset) Build() {
-	var cmp []byte
-	buffer := bytes.NewBuffer(cmp)
+func (a *Asset) set(id string, data []byte) error {
+	err := a.Cache.Set(a.buildId(id), data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
+func (a *Asset) build(id string, data interface{}) error {
 	tmp := template.New(a.ID)
 	tmp.Parse(string(a.Cache.Get(a.ID)))
-	tmp.Execute(buffer, a.Data)
+	tmp.Execute(&a.Data, data)
+	err := a.set(id, a.Data.Bytes())
+	if err != nil {
+		return err
+	}
+	a.Data.Reset()
+	return nil
+}
 
-	a.Set(a.ID, buffer.Bytes())
+func (a *Asset) Build(id string, data interface{}) error {
+	err := a.build(id, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	fmt.Println(buffer.String())
+func (a *Asset) buildId(id string) string {
+	return fmt.Sprintf("%s:%s", a.ID, id)
 }
