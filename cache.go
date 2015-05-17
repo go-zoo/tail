@@ -4,4 +4,5 @@ package tail
 type Cache interface {
 	Get(id string) []byte
 	Set(id string, data []byte) error
+	Del(id string) error
 }

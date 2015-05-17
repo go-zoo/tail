@@ -19,8 +19,8 @@ var (
 	//rediscache.New("tcp", "104.236.16.169:6379")
 	//boltcache.New("fetch.db", 0600, nil)
 
-	IndexTmpl = tail.New("index", "index.html", cache)
-	Img       = tail.New("img", "logo.png", cache)
+	IndexTmpl = tail.New("index", "index.html", int64(time.Second*5), cache)
+	Img       = tail.New("img", "logo.png", int64(time.Second*10), cache)
 )
 
 func main() {

@@ -25,3 +25,11 @@ func (m *MemoryCache) Set(id string, data []byte) error {
 	}
 	return errors.New("Source is nil")
 }
+
+func (m *MemoryCache) Del(id string) error {
+	if m.source[id] == nil {
+		return errors.New("Key doesn't exist")
+	}
+	delete(m.source, id)
+	return nil
+}
