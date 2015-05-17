@@ -6,8 +6,7 @@ tail [![GoDoc](https://godoc.org/github.com/go-zoo/tail?status.png)](http://godo
 
 Tail is a easy to use caching system for your web project. 
 It include multiple caching platform {redis, bolt, in memory} and more will come later.
-Once the ressource is in cache tail will update it if any change append.
-You can also force update at each X secondes with `indexTemplate.Watch("5s")`.
+Once the ressource is in cache tail will update it if any change happen.
 
 ![alt tag](http://blackheartmagazine.com/blog/wp-content/uploads/2014/01/tail.jpg)
 
