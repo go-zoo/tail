@@ -14,7 +14,7 @@ type Data struct {
 }
 
 var (
-	cache, _ = rediscache.New("tcp", "104.236.16.169:6379")
+	cache, _ = rediscache.New("tcp", "redis-cache-1.squiidz.cont.tutum.io:49153")
 	//memcache.New()
 	//rediscache.New("tcp", "104.236.16.169:6379")
 	//boltcache.New("fetch.db", 0600, nil)

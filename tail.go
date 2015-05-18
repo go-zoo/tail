@@ -56,6 +56,7 @@ func (a *Asset) cleanClient() {
 		time.AfterFunc(a.TTL, func() {
 			for _, c := range a.Clients {
 				if !c.Valid {
+					fmt.Printf("Client: %s have expire.\n", c.ID)
 					err := a.Del(c.ID)
 					if err != nil {
 						fmt.Println(err)
@@ -111,6 +112,7 @@ func (a *Asset) Get(id string) ([]byte, error) {
 
 func (c *Client) renewClient() {
 	c.Expire.Reset(c.TTL)
+	//c.Expire = time.NewTimer(c.TTL)
 	c.Valid = true
 }
 
@@ -122,6 +124,7 @@ func (a *Asset) GetOrBuild(id string, data interface{}) ([]byte, error) {
 			return nil, err
 		}
 	}
+	a.Clients[cid].renewClient()
 	return a.Cache.Get(cid), nil
 }
 
@@ -148,7 +151,6 @@ func (a *Asset) set(id string, data []byte) error {
 
 func (c *Client) watch() {
 	<-c.Expire.C
-	fmt.Printf("Client: %s have expire.\n", c.ID)
 	c.Valid = false
 }
 

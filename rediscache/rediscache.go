@@ -15,6 +15,7 @@ type RedisCache struct {
 func New(net string, addr string) (*RedisCache, error) {
 	conn, err := redis.Dial(net, addr)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	return &RedisCache{conn}, nil
