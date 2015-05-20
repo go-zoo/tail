@@ -44,10 +44,7 @@ func (b *BoltCache) Set(id string, data []byte) error {
 
 func (b *BoltCache) Del(id string) error {
 	b.source.Update(func(tx *bolt.Tx) error {
-		buck, err := tx.Bucket([]byte("default"))
-		if err != nil {
-			return err
-		}
+		buck := tx.Bucket([]byte("default"))
 		buck.Delete([]byte(id))
 		return nil
 	})
