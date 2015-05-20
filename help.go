@@ -29,7 +29,7 @@ func (a *Asset) WatchFile() {
 				select {
 				case event := <-watcher.Events:
 					if event.Op&fsnotify.Write == fsnotify.Write {
-						a.Refresh()
+						a.loadAsset()
 					}
 				case err := <-watcher.Errors:
 					fmt.Println(err)

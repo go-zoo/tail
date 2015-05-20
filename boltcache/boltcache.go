@@ -32,8 +32,23 @@ func (b *BoltCache) Get(id string) []byte {
 
 func (b *BoltCache) Set(id string, data []byte) error {
 	b.source.Update(func(tx *bolt.Tx) error {
-		buck, _ := tx.CreateBucketIfNotExists([]byte("default"))
+		buck, err := tx.CreateBucketIfNotExists([]byte("default"))
+		if err != nil {
+			return err
+		}
 		buck.Put([]byte(id), data)
+		return nil
+	})
+	return nil
+}
+
+func (b *BoltCache) Del(id string) error {
+	b.source.Update(func(tx *bolt.Tx) error {
+		buck, err := tx.Bucket([]byte("default"))
+		if err != nil {
+			return err
+		}
+		buck.Delete([]byte(id))
 		return nil
 	})
 	return nil
