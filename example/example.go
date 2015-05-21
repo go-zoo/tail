@@ -33,7 +33,7 @@ func main() {
 func indexHandler(rw http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		d := Data{Name: time.Now().String()}
-		IndexTmpl.Build("911205", d)
+		IndexTmpl.Create("911205", d)
 	}
 	data, _ := IndexTmpl.Get("911205")
 	rw.Write(data)
