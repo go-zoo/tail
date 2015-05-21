@@ -65,17 +65,13 @@ func (a *Asset) loadAsset() error {
 	return nil
 }
 
-func (a *Asset) Get(id string) ([]byte, error) {
+func (a *Asset) Get(id string) []byte {
 	cid := a.buildId(id)
-	if a.Clients[cid] != nil {
-		a.Clients[cid].renewClient()
-		d := a.Cache.Get(cid)
-		if d == nil {
-			return nil, errors.New(fmt.Sprintf("%s not found in cache !", cid))
-		}
-		return d, nil
+	if a.Clients[cid] == nil {
+		return nil
 	}
-	return nil, errors.New(fmt.Sprintf("%s don't exist !", cid))
+	a.Clients[cid].renewClient()
+	return a.Cache.Get(cid)
 }
 
 func (a *Asset) Set(id string, data []byte) error {
