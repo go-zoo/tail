@@ -100,8 +100,11 @@ func (a *Asset) create(id string, data interface{}) error {
 	var buff bytes.Buffer
 	tmp := template.New(a.ID)
 	tmp.Parse(string(a.Data))
-	tmp.Execute(&buff, data)
-	err := a.Set(id, buff.Bytes())
+	err := tmp.Execute(&buff, data)
+	if err != nil {
+		return err
+	}
+	err = a.Set(id, buff.Bytes())
 	if err != nil {
 		return err
 	}

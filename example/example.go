@@ -35,11 +35,11 @@ func indexHandler(rw http.ResponseWriter, req *http.Request) {
 		d := Data{Name: time.Now().String()}
 		IndexTmpl.Create("911205", d)
 	}
-	data, _ := IndexTmpl.Get("911205")
+	data := IndexTmpl.Get("911205")
 	rw.Write(data)
 }
 
 func imgHandler(rw http.ResponseWriter, req *http.Request) {
-	data, _ := Img.Get("")
+	data := Img.Get("")
 	rw.Write(data)
 }
