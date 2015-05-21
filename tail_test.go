@@ -8,7 +8,7 @@ import (
 
 func TestTemplateCreation(t *testing.T) {
 	cache := memcache.New()
-	tpl := New("test", "help.go", 5, cache)
+	tpl, _ := New("test", "help.go", 5, cache)
 	if tpl == nil {
 		t.Fail()
 	}
@@ -16,7 +16,7 @@ func TestTemplateCreation(t *testing.T) {
 
 func TestTemplateCaching(t *testing.T) {
 	cache := memcache.New()
-	tpl := New("test", "tail_test.go", 5, cache)
+	tpl, _ := New("test", "tail_test.go", 5, cache)
 	if tpl.get() == nil {
 		t.Fail()
 	}
@@ -24,8 +24,8 @@ func TestTemplateCaching(t *testing.T) {
 
 func TestMultipleTemplate(t *testing.T) {
 	cache := memcache.New()
-	tpl1 := New("1", "tail_test.go", 5, cache)
-	tpl2 := New("2", "tail.go", 5, cache)
+	tpl1, _ := New("1", "tail_test.go", 5, cache)
+	tpl2, _ := New("2", "tail.go", 5, cache)
 	if tpl1.get() == nil || tpl2.get() == nil {
 		t.Fail()
 	}
@@ -34,8 +34,8 @@ func TestMultipleTemplate(t *testing.T) {
 func TestMultipleCache(t *testing.T) {
 	c1 := memcache.New()
 	c2 := memcache.New()
-	tpl1 := New("1", "tail_test.go", 5, c1)
-	tpl2 := New("2", "tail.go", 5, c2)
+	tpl1, _ := New("1", "tail_test.go", 5, c1)
+	tpl2, _ := New("2", "tail.go", 5, c2)
 	if tpl1.get() == nil || tpl2.get() == nil {
 		t.Fail()
 	}
