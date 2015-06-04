@@ -44,6 +44,7 @@ func (a *Asset) cleanClient() {
 					if !c.Valid {
 						fmt.Printf("Client: %s has expired.\n", c.ID)
 						err := a.Del(c.ID)
+						fmt.Println(c.ID, "Deleted")
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -81,6 +82,14 @@ func (a *Asset) Set(id string, data []byte) error {
 		a.Clients[cid] = clt
 	}
 	err := a.Cache.Set(cid, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *Asset) Update(id string, data []byte) error {
+	err := a.Cache.Update(id, data)
 	if err != nil {
 		return err
 	}

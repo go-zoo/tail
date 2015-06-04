@@ -4,6 +4,7 @@ package memcache
 
 import (
 	"errors"
+	"fmt"
 )
 
 type MemoryCache struct {
@@ -24,6 +25,14 @@ func (m *MemoryCache) Set(id string, data []byte) error {
 		return nil
 	}
 	return errors.New("Source is nil")
+}
+
+func (m *MemoryCache) Update(id string, data []byte) error {
+	if m.source[id] != nil {
+		m.source[id] = data
+		return nil
+	}
+	return errors.New(fmt.Sprintf("%s doesn't exist\n", id))
 }
 
 func (m *MemoryCache) Del(id string) error {

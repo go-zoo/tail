@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-zoo/tail"
-	"github.com/go-zoo/tail/rediscache"
+	"github.com/go-zoo/tail/memcache"
 )
 
 type Data struct {
@@ -14,9 +14,9 @@ type Data struct {
 }
 
 var (
-	cache, _ = rediscache.New("tcp", "redis-cache-1.squiidz.cont.tutum.io:49153")
+	cache = memcache.New()
 	//memcache.New()
-	//rediscache.New("tcp", "104.236.16.169:6379")
+	//rediscache.New("tcp", "redis-cache-1.squiidz.cont.tutum.io:49153")
 	//boltcache.New("fetch.db", 0600, nil)
 
 	IndexTmpl, _ = tail.New("index", "index.html", time.Second*5, cache)
@@ -27,11 +27,11 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/img", imgHandler)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":9000", nil)
 }
 
 func indexHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/" {
+	if req.URL.Path == "/" {
 		d := Data{Name: time.Now().String()}
 		IndexTmpl.Create("911205", d)
 	}
