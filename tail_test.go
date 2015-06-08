@@ -7,7 +7,7 @@ import (
 )
 
 func TestTemplateCreation(t *testing.T) {
-	cache := memcache.New()
+	cache, _ := memcache.New()
 	_, err := New("test", "help.go", 5, cache)
 	if err != nil {
 		t.Fail()
@@ -15,7 +15,7 @@ func TestTemplateCreation(t *testing.T) {
 }
 
 func TestTemplateCaching(t *testing.T) {
-	cache := memcache.New()
+	cache, _ := memcache.New()
 	_, err := New("test", "tail_test.go", 5, cache)
 	if err != nil {
 		t.Fail()
@@ -23,7 +23,7 @@ func TestTemplateCaching(t *testing.T) {
 }
 
 func TestMultipleTemplate(t *testing.T) {
-	cache := memcache.New()
+	cache, _ := memcache.New()
 	_, err := New("1", "tail_test.go", 5, cache)
 	_, err2 := New("2", "tail.go", 5, cache)
 	if err != nil || err2 != nil {
@@ -32,8 +32,8 @@ func TestMultipleTemplate(t *testing.T) {
 }
 
 func TestMultipleCache(t *testing.T) {
-	c1 := memcache.New()
-	c2 := memcache.New()
+	c1, _ := memcache.New()
+	c2, _ := memcache.New()
 	_, err := New("1", "tail_test.go", 5, c1)
 	_, err2 := New("2", "tail.go", 5, c2)
 	if err != nil || err2 != nil {
