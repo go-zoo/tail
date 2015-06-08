@@ -21,8 +21,8 @@ func New(net string, addr string) (*RedisCache, error) {
 	return &RedisCache{conn}, nil
 }
 
-func (f *RedisCache) Get(id string) []byte {
-	n, err := f.source.Do("GET", id)
+func (r *RedisCache) Get(id string) []byte {
+	n, err := r.source.Do("GET", id)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -33,8 +33,8 @@ func (f *RedisCache) Get(id string) []byte {
 	return nil
 }
 
-func (f *RedisCache) Set(id string, data []byte) error {
-	_, err := f.source.Do("SET", id, data)
+func (r *RedisCache) Set(id string, data []byte) error {
+	_, err := r.source.Do("SET", id, data)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (f *RedisCache) Set(id string, data []byte) error {
 }
 
 func (r *RedisCache) Update(id string, data []byte) error {
-	_, err := f.source.Do("SET", id, data)
+	_, err := r.source.Do("SET", id, data)
 	if err != nil {
 		return err
 	}
