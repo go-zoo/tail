@@ -31,11 +31,7 @@ func main() {
 }
 
 func indexHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/" {
-		d := Data{Name: time.Now().String()}
-		IndexTmpl.Create("911205", d)
-	}
-	data := IndexTmpl.Get("911205")
+	data, _ := IndexTmpl.GetOrNew(req.RemoteAddr, &Data{req.RequestURI, 24})
 	rw.Write(data)
 }
 

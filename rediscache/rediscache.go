@@ -41,6 +41,14 @@ func (f *RedisCache) Set(id string, data []byte) error {
 	return nil
 }
 
+func (r *RedisCache) Update(id string, data []byte) error {
+	_, err := f.source.Do("SET", id, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RedisCache) Del(id string) error {
 	_, err := r.source.Do("DEL", id)
 	if err != nil {

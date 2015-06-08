@@ -1,7 +1,6 @@
 package boltcache
 
 import (
-	"log"
 	"os"
 
 	"github.com/boltdb/bolt"
@@ -13,12 +12,12 @@ type BoltCache struct {
 	source *bolt.DB
 }
 
-func New(path string, mode os.FileMode, options *bolt.Options) *BoltCache {
+func New(path string, mode os.FileMode, options *bolt.Options) (*BoltCache, error) {
 	boltC, err := bolt.Open(path, mode, options)
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
-	return &BoltCache{boltC}
+	return &BoltCache{boltC}, nil
 }
 
 func (b *BoltCache) Get(id string) []byte {
@@ -31,6 +30,18 @@ func (b *BoltCache) Get(id string) []byte {
 }
 
 func (b *BoltCache) Set(id string, data []byte) error {
+	b.source.Update(func(tx *bolt.Tx) error {
+		buck, err := tx.CreateBucketIfNotExists([]byte("default"))
+		if err != nil {
+			return err
+		}
+		buck.Put([]byte(id), data)
+		return nil
+	})
+	return nil
+}
+
+func (b *BoltCache) Update(id string, data []byte) error {
 	b.source.Update(func(tx *bolt.Tx) error {
 		buck, err := tx.CreateBucketIfNotExists([]byte("default"))
 		if err != nil {

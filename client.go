@@ -26,3 +26,7 @@ func (c *Client) renewClient() {
 	c.Expire.Reset(c.TTL)
 	c.Valid = true
 }
+
+func (c *Client) delClient() {
+	c.Valid = false
+}
