@@ -27,7 +27,7 @@ import(
 
 var (
   // Create the cache platform with your parameters
-  cache = rediscache.New("tcp", "localhost:6379")
+  cache, _ = rediscache.New("tcp", "localhost:6379")
 
   // Create a new template that takes (id, path, cachePlatform)
   indexTemplate = tail.New("index", "template/index.html", cache)
@@ -40,7 +40,7 @@ func main () {
 }
 
 func indexHandler(rw http.ResponseWriter, req *http.Request) {
-  rw.Write(indexTemplate.Get())
+  rw.Write(indexTemplate.Get(req.RemoteAddr))
 }
 
 ```

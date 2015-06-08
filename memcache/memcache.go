@@ -11,8 +11,8 @@ type MemoryCache struct {
 	source map[string][]byte
 }
 
-func New() *MemoryCache {
-	return &MemoryCache{source: make(map[string][]byte)}
+func New() (*MemoryCache, error) {
+	return &MemoryCache{source: make(map[string][]byte)}, nil
 }
 
 func (m *MemoryCache) Get(id string) []byte {
